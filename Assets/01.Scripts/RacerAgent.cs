@@ -7,9 +7,9 @@ using Unity.MLAgents.Actuators;
 
 public class RacerAgent : Agent
 {
-    private float _moveSpeed = 10f;
-    private float _turnSpeed = 25f;
-    private float _stamina = 100f;
+    public float MoveSpeed = 10f;
+    public float TurnSpeed = 25f;
+    public float Stamina = 100f;
     private Vector3 _direction;
 
     private Rigidbody _rigidbody;
@@ -23,8 +23,8 @@ public class RacerAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        _moveSpeed = Random.Range(10f, 15f);
-        _stamina = 100f;
+        MoveSpeed = Random.Range(10f, 15f);
+        Stamina = 100f;
         _direction = transform.forward;
 
         _rigidbody.velocity = _rigidbody.angularVelocity = Vector3.zero;
@@ -46,8 +46,8 @@ public class RacerAgent : Agent
         // DiscreteActions[0] : 지속(0), 가속(1), 감속(2)
         switch(DiscreteActions[0])
         {
-            case 1: _moveSpeed = Mathf.Clamp(_moveSpeed + 0.2f, 10f, 15f); break;
-            case 2: _moveSpeed = Mathf.Clamp(_moveSpeed - 0.2f, 10f, 15f); break;
+            case 1: MoveSpeed = Mathf.Clamp(MoveSpeed + 0.2f, 10f, 15f); break;
+            case 2: MoveSpeed = Mathf.Clamp(MoveSpeed - 0.2f, 10f, 15f); break;
         }
 
         // DiscreteActions[1] : 전방(0), 좌측(1), 우측(2)
@@ -57,8 +57,8 @@ public class RacerAgent : Agent
             case 2: rotationAxis = Vector3.up; break;
         }
 
-        _rigidbody.MovePosition(transform.position + _direction * _moveSpeed * Time.fixedDeltaTime);
-        transform.Rotate(rotationAxis, Mathf.Clamp(_turnSpeed * Time.fixedDeltaTime, -45f, 45f));
+        _rigidbody.MovePosition(transform.position + _direction * MoveSpeed * Time.fixedDeltaTime);
+        transform.Rotate(rotationAxis, Mathf.Clamp(TurnSpeed * Time.fixedDeltaTime, -45f, 45f));
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
