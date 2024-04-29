@@ -6149,10 +6149,10 @@ GameObject:
   - component: {fileID: 4757788895583889047}
   - component: {fileID: 106530633772014016}
   - component: {fileID: 536249479891707343}
-  - component: {fileID: 6741430314243370703}
-  - component: {fileID: 4096487085142310661}
-  - component: {fileID: 8050737774489947319}
-  - component: {fileID: 1823086725943667276}
+  - component: {fileID: 8370292807974499190}
+  - component: {fileID: 6471392972917246114}
+  - component: {fileID: 441864801270434307}
+  - component: {fileID: 4006852001481611491}
   m_Layer: 0
   m_Name: HorseAgent
   m_TagString: Untagged
@@ -6224,7 +6224,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.76201093, y: 2.9228745, z: 3.7429748}
   m_Center: {x: 0.013407305, y: 1.4614372, z: 0.15610743}
---- !u!114 &6741430314243370703
+--- !u!114 &8370292807974499190
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6237,24 +6237,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 0
+    VectorObservationSize: 1
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
-      BranchSizes: 0300000003000000
-    VectorActionSize: 0300000003000000
+      BranchSizes: 01000000
+    VectorActionSize: 01000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: HorseAgent
+  m_BehaviorName: My Behavior
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_ObservableAttributeHandling: 0
---- !u!114 &4096487085142310661
+--- !u!114 &6471392972917246114
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6269,11 +6269,11 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 10000
+  MaxStep: 0
   MoveSpeed: 10
   TurnSpeed: 25
   Stamina: 100
---- !u!114 &8050737774489947319
+--- !u!114 &441864801270434307
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6287,7 +6287,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DecisionPeriod: 5
   TakeActionsBetweenDecisions: 1
---- !u!114 &1823086725943667276
+--- !u!114 &4006852001481611491
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6300,9 +6300,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SensorName: RayPerceptionSensor
-  m_DetectableTags:
-  - Horse
-  - Fence
+  m_DetectableTags: []
   m_RaysPerDirection: 3
   m_MaxRayDegrees: 70
   m_SphereCastRadius: 0.5
