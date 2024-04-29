@@ -9,8 +9,10 @@ public class RacerAgent : Agent
 {
     public float MoveSpeed = 10f;
     public float TurnSpeed = 25f;
+
     public float Stamina = 100f;
-    private Vector3 _direction;
+    public float StaminaConsumptionRate = 1f;
+    private float StaminaTimer = 1f;
 
     private Rigidbody _rigidbody;
     private Vector3 StartPos;
@@ -23,9 +25,9 @@ public class RacerAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        MoveSpeed = Random.Range(10f, 15f);
+        MoveSpeed = 12.5f;
         Stamina = 100f;
-        _direction = transform.forward;
+        StaminaConsumptionRate = 1f;
 
         _rigidbody.velocity = _rigidbody.angularVelocity = Vector3.zero;
         transform.localPosition = StartPos;
@@ -43,22 +45,46 @@ public class RacerAgent : Agent
 
         Vector3 rotationAxis = Vector3.zero;
 
+        // 1초마다 감소하게 해야함. 스테미나
+
         // DiscreteActions[0] : 지속(0), 가속(1), 감속(2)
-        switch(DiscreteActions[0])
+        if(!(Stamina < 0))
         {
-            case 1: MoveSpeed = Mathf.Clamp(MoveSpeed + 0.2f, 10f, 15f); break;
-            case 2: MoveSpeed = Mathf.Clamp(MoveSpeed - 0.2f, 10f, 15f); break;
+            switch (DiscreteActions[0])
+            {
+                case 1:
+                    {
+                        MoveSpeed = Mathf.Clamp(MoveSpeed + 0.2f, 10f, 20f);
+                        TurnSpeed = Mathf.Clamp(TurnSpeed - 0.5f, 10f, 35f);
+                        StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate + 0.02f, 1f, 1.5f);
+                        break;
+                    }
+                case 2:
+                    {
+                        MoveSpeed = Mathf.Clamp(MoveSpeed - 0.2f, 10f, 20f);
+                        TurnSpeed = Mathf.Clamp(TurnSpeed + 0.5f, 10f, 35f);
+                        StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate - 0.02f, 1f, 1.5f);
+                        break;
+                    }
+            }
+        }
+        else
+        {
+            MoveSpeed = 10f;
+            TurnSpeed = 10f;
         }
 
         // DiscreteActions[1] : 전방(0), 좌측(1), 우측(2)
-        switch(DiscreteActions[1])
+        switch (DiscreteActions[1])
         {
             case 1: rotationAxis = Vector3.down; break;
             case 2: rotationAxis = Vector3.up; break;
         }
 
-        _rigidbody.MovePosition(transform.position + _direction * MoveSpeed * Time.fixedDeltaTime);
+        _rigidbody.MovePosition(transform.position + transform.forward * MoveSpeed * Time.fixedDeltaTime);
         transform.Rotate(rotationAxis, Mathf.Clamp(TurnSpeed * Time.fixedDeltaTime, -45f, 45f));
+
+        Stamina -= StaminaConsumptionRate;
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
