@@ -12,15 +12,16 @@ public class RacerAgent : Agent
 
     public float Stamina = 100f;
     public float StaminaConsumptionRate = 1f;
-    private float StaminaTimer = 1f;
+    private float _staminaTimer = 0f;
+    private float _consumptionTime = 1f;
 
     private Rigidbody _rigidbody;
-    private Vector3 StartPos;
+    private Vector3 _startPos;
 
     public override void Initialize()
     {
         _rigidbody = GetComponent<Rigidbody>();
-        StartPos = transform.localPosition;
+        _startPos = transform.localPosition;
     }
 
     public override void OnEpisodeBegin()
@@ -30,7 +31,7 @@ public class RacerAgent : Agent
         StaminaConsumptionRate = 1f;
 
         _rigidbody.velocity = _rigidbody.angularVelocity = Vector3.zero;
-        transform.localPosition = StartPos;
+        transform.localPosition = _startPos;
         transform.localRotation = Quaternion.identity;
     }
 
@@ -48,7 +49,7 @@ public class RacerAgent : Agent
         // 1초마다 감소하게 해야함. 스테미나
 
         // DiscreteActions[0] : 지속(0), 가속(1), 감속(2)
-        if(!(Stamina < 0))
+        if (!(Stamina < 0))
         {
             switch (DiscreteActions[0])
             {
@@ -84,7 +85,11 @@ public class RacerAgent : Agent
         _rigidbody.MovePosition(transform.position + transform.forward * MoveSpeed * Time.fixedDeltaTime);
         transform.Rotate(rotationAxis, Mathf.Clamp(TurnSpeed * Time.fixedDeltaTime, -45f, 45f));
 
-        Stamina -= StaminaConsumptionRate;
+        _staminaTimer += Time.deltaTime;
+        if (_staminaTimer > _consumptionTime)
+        {
+            Stamina -= StaminaConsumptionRate;
+        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
