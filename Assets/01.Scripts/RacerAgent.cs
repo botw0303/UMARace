@@ -10,6 +10,10 @@ public class RacerAgent : Agent
     public float MoveSpeed = 10f;
     public float TurnSpeed = 25f;
 
+    private float _testValue;
+    private Material _testmaterial;
+    private SkinnedMeshRenderer _renderer;
+
     public float Stamina = 100f;
     public float StaminaConsumptionRate = 1f;
     private float _staminaTimer = 0f;
