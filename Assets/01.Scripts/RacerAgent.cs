@@ -93,6 +93,11 @@ public class RacerAgent : Agent
         if (_staminaTimer > _consumptionTime)
         {
             Stamina -= StaminaConsumptionRate;
+
+            if(Stamina < 0)
+            {
+                AddReward(-1f / MaxStep);
+            }
         }
     }
 
@@ -115,6 +120,18 @@ public class RacerAgent : Agent
         if (Input.GetKey(KeyCode.D))
         {
             DiscreteActionsOut[1] = 2;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.CompareTag("Horse"))
+        {
+            AddReward(-1.5f);
+        }
+        else if (collision.transform.CompareTag("Fence"))
+        {
+            AddReward(-1f);
         }
     }
 }
