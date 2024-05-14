@@ -15,6 +15,11 @@ public class GameManager : MonoSingleton<GameManager>
         {
             Ranking.Add(racer, Vector3.Distance(CheckPoints[0].transform.position, racer.transform.position));
         }
-        
+        Ranking = Ranking.OrderByDescending(item => item.Value).ToDictionary(item => item.Key, item => item.Value);
+    }
+
+    public void RemoveCheckPoint()
+    {
+
     }
 }
