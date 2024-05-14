@@ -133,5 +133,9 @@ public class RacerAgent : Agent
         {
             AddReward(-1f);
         }
+        else if (collision.transform.CompareTag("GoalLine"))
+        {
+
+        }
     }
 }
