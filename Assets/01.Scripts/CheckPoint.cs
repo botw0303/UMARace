@@ -8,7 +8,7 @@ public class CheckPoint : MonoBehaviour
     {
         if (collision.transform.CompareTag("Horse"))
         {
-            GameManager.Instance.RemoveCheckPoint(this);
+            collision.transform.GetComponent<RacerAgent>().IncreaseCheckPointCnt();
         }
     }
 }

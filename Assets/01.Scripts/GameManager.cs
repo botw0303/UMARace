@@ -11,7 +11,7 @@ public class GameManager : MonoSingleton<GameManager>
 
     private void Update()
     {
-        foreach(var racer in RacerList)
+        foreach (var racer in RacerList)
         {
             Ranking.Add(racer, Vector3.Distance(CheckPointList[0].transform.position, racer.transform.position));
         }
@@ -24,14 +24,8 @@ public class GameManager : MonoSingleton<GameManager>
         Ranking.Clear();
     }
 
-    public void RemoveCheckPoint(CheckPoint checkPoint)
+    public float GetRewardByRanking(RacerAgent agent)
     {
-        CheckPointList.Remove(checkPoint);
-        Destroy(checkPoint);
-    }
-
-    public void GetRewardByRanking(RacerAgent agent)
-    {
-        // Dictionary의 검색해서 인덱스를 가져오고 그 인덱스에 따라서 점수 반환하도록
+        return 11 - Ranking[agent];
     }
 }

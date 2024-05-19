@@ -22,6 +22,8 @@ public class RacerAgent : Agent
     private Rigidbody _rigidbody;
     private Vector3 _startPos;
 
+    private int _checkPointCnt = 0;
+
     public override void Initialize()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -33,6 +35,7 @@ public class RacerAgent : Agent
         MoveSpeed = 12.5f;
         Stamina = 100f;
         StaminaConsumptionRate = 1f;
+        _checkPointCnt = 0;
 
         _rigidbody.velocity = _rigidbody.angularVelocity = Vector3.zero;
         transform.localPosition = _startPos;
@@ -94,9 +97,9 @@ public class RacerAgent : Agent
         {
             Stamina -= StaminaConsumptionRate;
 
-            if(Stamina < 0)
+            if (Stamina < 0)
             {
-                AddReward(-1f / MaxStep);
+                AddReward(-0.01f / MaxStep);
             }
         }
     }
@@ -135,7 +138,16 @@ public class RacerAgent : Agent
         }
         else if (collision.transform.CompareTag("GoalLine"))
         {
-
+            if(_checkPointCnt == 21)
+            {
+                GameManager.Instance.GetRewardByRanking(this);
+                EndEpisode();
+            }
         }
+    }
+
+    public void IncreaseCheckPointCnt()
+    {
+        _checkPointCnt++;
     }
 }
