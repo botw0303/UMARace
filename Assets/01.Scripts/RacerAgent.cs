@@ -22,12 +22,14 @@ public class RacerAgent : Agent
     private Rigidbody _rigidbody;
     private Vector3 _startPos;
 
-    private int _checkPointCnt = 0;
+    public int _checkPointCnt = 0;
+    private Dictionary<string, GameObject> CheckedPointDictionary;
 
     public override void Initialize()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _startPos = transform.localPosition;
+        CheckedPointDictionary = new Dictionary<string, GameObject>();
     }
 
     public override void OnEpisodeBegin()
@@ -128,6 +130,7 @@ public class RacerAgent : Agent
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log($"{gameObject.name} detect {collision.gameObject.name}");
         if (collision.transform.CompareTag("Horse"))
         {
             AddReward(-1.5f);
@@ -136,9 +139,18 @@ public class RacerAgent : Agent
         {
             AddReward(-1f);
         }
+        else if (collision.transform.CompareTag("CheckPoint"))
+        {
+            if (!CheckedPointDictionary.ContainsKey(collision.gameObject.name))
+            {
+                IncreaseCheckPointCnt();
+                AddReward(0.1f);
+                CheckedPointDictionary.Add(collision.gameObject.name, collision.gameObject);
+            }
+        }
         else if (collision.transform.CompareTag("GoalLine"))
         {
-            if(_checkPointCnt == 21)
+            if (_checkPointCnt >= 21)
             {
                 GameManager.Instance.GetRewardByRanking(this);
                 EndEpisode();
@@ -149,5 +161,6 @@ public class RacerAgent : Agent
     public void IncreaseCheckPointCnt()
     {
         _checkPointCnt++;
+        Debug.Log($"{gameObject.name} Checked Point Cnt is {_checkPointCnt}");
     }
 }

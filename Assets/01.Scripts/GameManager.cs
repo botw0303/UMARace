@@ -6,26 +6,30 @@ using UnityEngine;
 public class GameManager : MonoSingleton<GameManager>
 {
     public List<RacerAgent> RacerList = new List<RacerAgent>();
-    public List<CheckPoint> CheckPointList = new List<CheckPoint>();
+    public List<GameObject> CheckPointList = new List<GameObject>();
     public Dictionary<RacerAgent, float> Ranking = new Dictionary<RacerAgent, float>();
 
-    private void Update()
+    private void FixedUpdate()
     {
         foreach (var racer in RacerList)
         {
-            Ranking.Add(racer, Vector3.Distance(CheckPointList[0].transform.position, racer.transform.position));
+            Ranking[racer] = Vector3.Distance(CheckPointList[0].transform.position, racer.transform.position);
         }
-        Ranking = Ranking.OrderByDescending(item => item.Value).ToDictionary(item => item.Key, item => item.Value);
-    }
-
-    public void GameSetting()
-    {
-        CheckPointList = FindObjectsByType<CheckPoint>(FindObjectsSortMode.None).ToList();
-        Ranking.Clear();
+        Ranking.OrderBy(item => item.Value).ToDictionary(item => item.Key, item => item.Value);
     }
 
     public float GetRewardByRanking(RacerAgent agent)
     {
-        return 11 - Ranking[agent];
+        int idx = 0;
+        foreach(var racer in RacerList)
+        {
+            idx++;
+            if(racer == agent)
+            {
+                return 11 - idx;
+            }
+        }
+
+        return 0;
     }
 }
