@@ -8,6 +8,7 @@ public class GameManager : MonoSingleton<GameManager>
     public List<RacerAgent> RacerList = new List<RacerAgent>();
     public List<GameObject> CheckPointList = new List<GameObject>();
     public Dictionary<RacerAgent, float> Ranking = new Dictionary<RacerAgent, float>();
+    public Dictionary<string, GameObject> GoalInRacer = new Dictionary<string, GameObject>();
 
     private void FixedUpdate()
     {
@@ -31,5 +32,13 @@ public class GameManager : MonoSingleton<GameManager>
         }
 
         return 0;
+    }
+
+    public void EndEpisodeAllRacer()
+    {
+        foreach(var racer in RacerList)
+        {
+            racer.EndEpisode();
+        }
     }
 }

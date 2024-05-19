@@ -38,10 +38,13 @@ public class RacerAgent : Agent
         Stamina = 100f;
         StaminaConsumptionRate = 1f;
         _checkPointCnt = 0;
+        CheckedPointDictionary.Clear();
 
         _rigidbody.velocity = _rigidbody.angularVelocity = Vector3.zero;
         transform.localPosition = _startPos;
         transform.localRotation = Quaternion.identity;
+
+        GameManager.Instance.GoalInRacer.Clear();
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -130,7 +133,6 @@ public class RacerAgent : Agent
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log($"{gameObject.name} detect {collision.gameObject.name}");
         if (collision.transform.CompareTag("Horse"))
         {
             AddReward(-1.5f);
@@ -139,21 +141,36 @@ public class RacerAgent : Agent
         {
             AddReward(-1f);
         }
-        else if (collision.transform.CompareTag("CheckPoint"))
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.transform.CompareTag("CheckPoint"))
         {
-            if (!CheckedPointDictionary.ContainsKey(collision.gameObject.name))
+            if (!CheckedPointDictionary.ContainsKey(other.gameObject.name))
             {
                 IncreaseCheckPointCnt();
                 AddReward(0.1f);
-                CheckedPointDictionary.Add(collision.gameObject.name, collision.gameObject);
+                CheckedPointDictionary.Add(other.gameObject.name, other.gameObject);
             }
         }
-        else if (collision.transform.CompareTag("GoalLine"))
+        else if (other.transform.CompareTag("GoalLine"))
         {
+            Debug.Log("일단 충돌은 됨");
             if (_checkPointCnt >= 21)
             {
-                GameManager.Instance.GetRewardByRanking(this);
-                EndEpisode();
+                Debug.Log("체크 포인트도 다 돌았음");
+                if (!GameManager.Instance.GoalInRacer.ContainsKey(gameObject.name))
+                {
+                    Debug.Log("골인해서 골인한 레이서 목록에 넣어주고 리워드 줌");
+                    GameManager.Instance.GoalInRacer.Add(gameObject.name, gameObject);
+                    GameManager.Instance.GetRewardByRanking(this);
+                }
+                if (GameManager.Instance.GoalInRacer.Count >= 9)
+                {
+                    Debug.Log("EndEpisode");
+                    //GameManager.Instance.EndEpisodeAllRacer();
+                }
             }
         }
     }
@@ -161,6 +178,5 @@ public class RacerAgent : Agent
     public void IncreaseCheckPointCnt()
     {
         _checkPointCnt++;
-        Debug.Log($"{gameObject.name} Checked Point Cnt is {_checkPointCnt}");
     }
 }
