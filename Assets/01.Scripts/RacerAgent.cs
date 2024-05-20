@@ -25,6 +25,10 @@ public class RacerAgent : Agent
     public int _checkPointCnt = 0;
     private Dictionary<string, GameObject> CheckedPointDictionary;
 
+    private bool _isGoalIn = false;
+
+    private float _distanceToNextCheckPoint = 0f;
+
     public override void Initialize()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -44,6 +48,10 @@ public class RacerAgent : Agent
         transform.localPosition = _startPos;
         transform.localRotation = Quaternion.identity;
 
+        _isGoalIn = false;
+
+        _distanceToNextCheckPoint = 0f;
+
         GameManager.Instance.GoalInRacer.Clear();
     }
 
@@ -54,58 +62,66 @@ public class RacerAgent : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        var DiscreteActions = actions.DiscreteActions;
-
-        Vector3 rotationAxis = Vector3.zero;
-
-        // 1초마다 감소하게 해야함. 스테미나
-
-        // DiscreteActions[0] : 지속(0), 가속(1), 감속(2)
-        if (!(Stamina < 0))
+        if (!_isGoalIn)
         {
-            switch (DiscreteActions[0])
+            var DiscreteActions = actions.DiscreteActions;
+
+            Vector3 rotationAxis = Vector3.zero;
+
+            // 1초마다 감소하게 해야함. 스테미나
+
+            // DiscreteActions[0] : 지속(0), 가속(1), 감속(2)
+            if (!(Stamina < 0))
             {
-                case 1:
-                    {
-                        MoveSpeed = Mathf.Clamp(MoveSpeed + 0.2f, 10f, 20f);
-                        TurnSpeed = Mathf.Clamp(TurnSpeed - 0.5f, 10f, 35f);
-                        StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate + 0.02f, 1f, 1.5f);
-                        break;
-                    }
-                case 2:
-                    {
-                        MoveSpeed = Mathf.Clamp(MoveSpeed - 0.2f, 10f, 20f);
-                        TurnSpeed = Mathf.Clamp(TurnSpeed + 0.5f, 10f, 35f);
-                        StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate - 0.02f, 1f, 1.5f);
-                        break;
-                    }
+                switch (DiscreteActions[0])
+                {
+                    case 1:
+                        {
+                            MoveSpeed = Mathf.Clamp(MoveSpeed + 0.2f, 10f, 20f);
+                            TurnSpeed = Mathf.Clamp(TurnSpeed - 0.5f, 10f, 35f);
+                            StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate + 0.02f, 1f, 1.5f);
+                            break;
+                        }
+                    case 2:
+                        {
+                            MoveSpeed = Mathf.Clamp(MoveSpeed - 0.2f, 10f, 20f);
+                            TurnSpeed = Mathf.Clamp(TurnSpeed + 0.5f, 10f, 35f);
+                            StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate - 0.02f, 1f, 1.5f);
+                            break;
+                        }
+                }
+            }
+            else
+            {
+                MoveSpeed = 10f;
+                TurnSpeed = 10f;
+            }
+
+            // DiscreteActions[1] : 전방(0), 좌측(1), 우측(2)
+            switch (DiscreteActions[1])
+            {
+                case 1: rotationAxis = Vector3.down; break;
+                case 2: rotationAxis = Vector3.up; break;
+            }
+
+            _rigidbody.MovePosition(transform.position + transform.forward * MoveSpeed * Time.fixedDeltaTime);
+            transform.Rotate(rotationAxis, Mathf.Clamp(TurnSpeed * Time.fixedDeltaTime, -45f, 45f));
+
+            _staminaTimer += Time.deltaTime;
+            if (_staminaTimer > _consumptionTime)
+            {
+                Stamina -= StaminaConsumptionRate;
+                _staminaTimer = 0f;
+
+                if (Stamina < 0)
+                {
+                    AddReward(-0.01f / MaxStep);
+                }
             }
         }
         else
         {
-            MoveSpeed = 10f;
-            TurnSpeed = 10f;
-        }
-
-        // DiscreteActions[1] : 전방(0), 좌측(1), 우측(2)
-        switch (DiscreteActions[1])
-        {
-            case 1: rotationAxis = Vector3.down; break;
-            case 2: rotationAxis = Vector3.up; break;
-        }
-
-        _rigidbody.MovePosition(transform.position + transform.forward * MoveSpeed * Time.fixedDeltaTime);
-        transform.Rotate(rotationAxis, Mathf.Clamp(TurnSpeed * Time.fixedDeltaTime, -45f, 45f));
-
-        _staminaTimer += Time.deltaTime;
-        if (_staminaTimer > _consumptionTime)
-        {
-            Stamina -= StaminaConsumptionRate;
-
-            if (Stamina < 0)
-            {
-                AddReward(-0.01f / MaxStep);
-            }
+            _rigidbody.velocity = Vector3.zero;
         }
     }
 
@@ -165,11 +181,13 @@ public class RacerAgent : Agent
                     Debug.Log("골인해서 골인한 레이서 목록에 넣어주고 리워드 줌");
                     GameManager.Instance.GoalInRacer.Add(gameObject.name, gameObject);
                     GameManager.Instance.GetRewardByRanking(this);
+                    _isGoalIn = true;
+
                 }
-                if (GameManager.Instance.GoalInRacer.Count >= 9)
+                if (GameManager.Instance.GoalInRacer.Count >= GameManager.Instance.RacerList.Count - 1)
                 {
                     Debug.Log("EndEpisode");
-                    //GameManager.Instance.EndEpisodeAllRacer();
+                    GameManager.Instance.EndEpisodeAllRacer();
                 }
             }
         }

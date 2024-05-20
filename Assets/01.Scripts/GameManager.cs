@@ -41,4 +41,9 @@ public class GameManager : MonoSingleton<GameManager>
             racer.EndEpisode();
         }
     }
+
+    public float GetDistanceToNextCheckPoint(RacerAgent racer)
+    {
+        return Vector3.Distance()
+    }
 }
