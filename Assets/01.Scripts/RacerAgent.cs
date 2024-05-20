@@ -28,6 +28,7 @@ public class RacerAgent : Agent
     private bool _isGoalIn = false;
 
     private float _distanceToNextCheckPoint = 0f;
+    private float _lastDistanceToNextCheckPoint = 0f;
 
     public override void Initialize()
     {
@@ -51,6 +52,7 @@ public class RacerAgent : Agent
         _isGoalIn = false;
 
         _distanceToNextCheckPoint = 0f;
+        _lastDistanceToNextCheckPoint = 0f;
 
         GameManager.Instance.GoalInRacer.Clear();
     }
@@ -68,7 +70,7 @@ public class RacerAgent : Agent
 
             Vector3 rotationAxis = Vector3.zero;
 
-            // 1초마다 감소하게 해야함. 스테미나
+            _lastDistanceToNextCheckPoint = GameManager.Instance.GetDistanceToNextCheckPoint(this);
 
             // DiscreteActions[0] : 지속(0), 가속(1), 감속(2)
             if (!(Stamina < 0))
@@ -106,6 +108,17 @@ public class RacerAgent : Agent
 
             _rigidbody.MovePosition(transform.position + transform.forward * MoveSpeed * Time.fixedDeltaTime);
             transform.Rotate(rotationAxis, Mathf.Clamp(TurnSpeed * Time.fixedDeltaTime, -45f, 45f));
+
+            _distanceToNextCheckPoint = GameManager.Instance.GetDistanceToNextCheckPoint(this);
+
+            if(_distanceToNextCheckPoint > _lastDistanceToNextCheckPoint)
+            {
+                AddReward(-0.1f);
+            }
+            else if(_distanceToNextCheckPoint < _lastDistanceToNextCheckPoint)
+            {
+                AddReward(0.2f);
+            }
 
             _staminaTimer += Time.deltaTime;
             if (_staminaTimer > _consumptionTime)
@@ -151,7 +164,7 @@ public class RacerAgent : Agent
     {
         if (collision.transform.CompareTag("Horse"))
         {
-            AddReward(-1.5f);
+            //AddReward(-1.5f);
         }
         else if (collision.transform.CompareTag("Fence"))
         {
