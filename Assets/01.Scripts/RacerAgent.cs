@@ -30,6 +30,8 @@ public class RacerAgent : Agent
     private float _distanceToNextCheckPoint = 0f;
     private float _lastDistanceToNextCheckPoint = 0f;
 
+    private float _goalTimer = 0f;
+
     public override void Initialize()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -54,12 +56,16 @@ public class RacerAgent : Agent
         _distanceToNextCheckPoint = 0f;
         _lastDistanceToNextCheckPoint = 0f;
 
+        _goalTimer = 0f;
+
         GameManager.Instance.GoalInRacer.Clear();
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-
+        sensor.AddObservation(_goalTimer);
+        sensor.AddObservation(transform.forward);
+        sensor.AddObservation(_distanceToNextCheckPoint);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -111,11 +117,11 @@ public class RacerAgent : Agent
 
             _distanceToNextCheckPoint = GameManager.Instance.GetDistanceToNextCheckPoint(this);
 
-            if(_distanceToNextCheckPoint > _lastDistanceToNextCheckPoint)
+            if (_distanceToNextCheckPoint > _lastDistanceToNextCheckPoint)
             {
                 AddReward(-0.1f);
             }
-            else if(_distanceToNextCheckPoint < _lastDistanceToNextCheckPoint)
+            else if (_distanceToNextCheckPoint < _lastDistanceToNextCheckPoint)
             {
                 AddReward(0.2f);
             }
@@ -131,6 +137,8 @@ public class RacerAgent : Agent
                     AddReward(-0.01f / MaxStep);
                 }
             }
+
+            _goalTimer = Time.deltaTime;
         }
         else
         {
@@ -164,7 +172,7 @@ public class RacerAgent : Agent
     {
         if (collision.transform.CompareTag("Horse"))
         {
-            //AddReward(-1.5f);
+            AddReward(-1f);
         }
         else if (collision.transform.CompareTag("Fence"))
         {
@@ -178,8 +186,15 @@ public class RacerAgent : Agent
         {
             if (!CheckedPointDictionary.ContainsKey(other.gameObject.name))
             {
+                if (other == GameManager.Instance.CheckPointList[CheckedPointDictionary.Count])
+                {
+                    AddReward(0.1f);
+                }
+                else
+                {
+                    AddReward(-1f);
+                }
                 IncreaseCheckPointCnt();
-                AddReward(0.1f);
                 CheckedPointDictionary.Add(other.gameObject.name, other.gameObject);
             }
         }
