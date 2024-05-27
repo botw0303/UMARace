@@ -89,14 +89,14 @@ public class RacerAgent : Agent
                         {
                             MoveSpeed = Mathf.Clamp(MoveSpeed + 0.15f, 10f, 25f);
                             TurnSpeed = Mathf.Clamp(TurnSpeed - 0.25f, 10f, 35f);
-                            StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate + 0.03f, 1f, 4f);
+                            StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate + 0.02f, 1f, 3f);
                             break;
                         }
                     case 2:
                         {
                             MoveSpeed = Mathf.Clamp(MoveSpeed - 0.15f, 10f, 25f);
                             TurnSpeed = Mathf.Clamp(TurnSpeed + 0.25f, 10f, 35f);
-                            StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate - 0.03f, 1f, 4f);
+                            StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate - 0.02f, 1f, 3f);
                             break;
                         }
                 }
