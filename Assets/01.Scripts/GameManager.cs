@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,18 @@ public class GameManager : MonoSingleton<GameManager>
     public Dictionary<RacerAgent, float> Ranking = new Dictionary<RacerAgent, float>();
     public Dictionary<string, GameObject> GoalInRacer = new Dictionary<string, GameObject>();
 
+    public List<CinemachineVirtualCamera> VCamList = new List<CinemachineVirtualCamera>();
+    private int _camIdx = 0;
+
     private void FixedUpdate()
     {
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            VCamList[_camIdx++].Priority = 10;
+            _camIdx = _camIdx % VCamList.Count;
+            VCamList[_camIdx].Priority = 20;
+        }
+
         foreach (var racer in RacerList)
         {
             Ranking[racer] = Vector3.Distance(CheckPointList[0].transform.position, racer.transform.position);
