@@ -21,6 +21,7 @@ public class RacerAgent : Agent
 
     private Rigidbody _rigidbody;
     private Vector3 _startPos;
+    private Quaternion _startRotation;
 
     public int _checkPointCnt = 0;
     private Dictionary<string, GameObject> CheckedPointDictionary;
@@ -36,6 +37,7 @@ public class RacerAgent : Agent
     {
         _rigidbody = GetComponent<Rigidbody>();
         _startPos = transform.localPosition;
+        _startRotation = transform.localRotation;
         CheckedPointDictionary = new Dictionary<string, GameObject>();
     }
 
@@ -49,7 +51,7 @@ public class RacerAgent : Agent
 
         _rigidbody.velocity = _rigidbody.angularVelocity = Vector3.zero;
         transform.localPosition = _startPos;
-        transform.localRotation = Quaternion.identity;
+        transform.localRotation = _startRotation;
 
         _isGoalIn = false;
 
@@ -85,16 +87,16 @@ public class RacerAgent : Agent
                 {
                     case 1:
                         {
-                            MoveSpeed = Mathf.Clamp(MoveSpeed + 0.2f, 10f, 20f);
-                            TurnSpeed = Mathf.Clamp(TurnSpeed - 0.5f, 10f, 35f);
+                            MoveSpeed = Mathf.Clamp(MoveSpeed + 0.2f, 10f, 30f);
+                            TurnSpeed = Mathf.Clamp(TurnSpeed - 0.25f, 10f, 35f);
                             StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate + 0.02f, 1f, 1.5f);
                             break;
                         }
                     case 2:
                         {
-                            MoveSpeed = Mathf.Clamp(MoveSpeed - 0.2f, 10f, 20f);
-                            TurnSpeed = Mathf.Clamp(TurnSpeed + 0.5f, 10f, 35f);
-                            StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate - 0.02f, 1f, 1.5f);
+                            MoveSpeed = Mathf.Clamp(MoveSpeed - 0.2f, 10f, 30f);
+                            TurnSpeed = Mathf.Clamp(TurnSpeed + 0.25f, 10f, 35f);
+                            StaminaConsumptionRate = Mathf.Clamp(StaminaConsumptionRate - 0.01f, 1f, 2f);
                             break;
                         }
                 }
